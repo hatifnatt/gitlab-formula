@@ -1,0 +1,26 @@
+gitlab:
+  runner:
+    version: ''
+    user: gitlab-runner
+    group: gitlab-runner
+    root_user: root
+    root_group: root
+    home: /home/gitlab-runner
+    run_as_root: true
+    service:
+      name: gitlab-runner
+      status: running
+      enable: true
+    pytoml_pkg: python3-toml
+    docker:
+      add_to_group: false
+      group: docker
+    registration_token: ''
+    delete_removed: true
+    config_file: /etc/gitlab-runner/config.toml
+    config:
+      concurrent: 4
+      check_interval: 0
+      session_server:
+        session_timeout: 1800
+    runners: []

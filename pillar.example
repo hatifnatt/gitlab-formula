@@ -1,0 +1,60 @@
+gitlab:
+  runner:
+    # gitlab-runner version like 12.9*
+    version: ''
+    # user, group and home values only for reference - that's defaults used in gitlab-runner package
+    # but they can probably vary in different operating systems
+    user: gitlab-runner
+    group: gitlab-runner
+    home: /home/gitlab-runner
+    # on behalf of which user to run the service
+    # true - run as superuser (root)
+    # false - run as user defined above under 'user' key (usually 'gitlab-runner')
+    run_as_root: true
+    service:
+      name: gitlab-runner
+      status: running # running | dead
+      enable: true # true | false | none
+    pytoml_pkg: python3-toml
+    docker:
+      # add gitlab-runner user to docker group?
+      # take into account, security problems caused by this approach
+      # https://docs.docker.com/engine/install/linux-postinstall/
+      # NOTE: in order for this to work install docker first
+      add_to_group: true
+      # gitlab user will be added to this group, to be able to control Docker via unix socket
+      group: docker
+    # registration token is mandatory, you can get it form your GitLab 'Admin Area > Runners'
+    # or per project 'Project Setting > CI/CD > Runners'
+    registration_token: ''
+    # delete from configuration file all runners which are not present on gitlab server
+    # 'gitlab-runner verify --delete' will be executed if any broken runners are found
+    delete_removed: true
+    # all configuration except runners
+    config:
+      concurrent: 4
+      check_interval: 0
+      session_server:
+        session_timeout: 1800
+    # list of runners to configure
+    # to get valid key names run `gitlab-runner register --help`
+    # do not use short names i.e. use
+    # url: "https://gitlab.com/"
+    # not
+    # u: "https://gitlab.com/"
+    runners:
+      # basic runner with shell executor
+      - name: "{{ grains.id.split('.')[0] }}-shell"
+        url: "http://gitlab.int.domain.tld/"
+        executor: shell
+        tag-list: shell
+        # use internal address for clone
+        clone-url: "http://gitlab.int.domain.tld/"
+      # runner with docker executor
+      - name: "{{ grains.id.split('.')[0] }}-docker"
+        url: "http://gitlab.int.domain.tld/"
+        executor: docker
+        tag-list: docker
+        clone-url: "http://gitlab.int.domain.tld/"
+        docker-tlsverify: "false"
+        docker-image: "debian:buster-backports"

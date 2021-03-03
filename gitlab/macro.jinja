@@ -1,0 +1,7 @@
+{%- macro register_command(args,nl_sep=' \\',ind=8) -%}
+{%- set main_cmd = 'gitlab-runner register --non-interactive' -%}
+{{ main_cmd }}{{ nl_sep }}
+{% for k, v in args|dictsort -%}
+{{ '--'|indent(ind, True) }}{{ k }}="{{ v }}"{% if not loop.last %}{{ nl_sep }}{% endif %}
+{% endfor -%}
+{%- endmacro -%}
