@@ -3,17 +3,17 @@
 {{ main_cmd }}{{ nl_sep }}
 {#- Iterate over k:v items -#}
 {%- for k, v in args|dictsort %}
-    {#- If value is regular string just print it like --k=v -#}
-    {%- if v is string %}
+    {#- If value is regular string, number or boolean just print it like --k=v -#}
+    {%- if v is string or v is number or v is sameas true or v is sameas false %}
         {#- Unless last loop iteration print newline separator #}
-{{ '--'|indent(ind, True) }}{{ k }}="{{ v }}"{% if not loop.last %}{{ nl_sep }}{% endif %}
+{{ '--'|indent(ind, True) }}{{ k }}="{{ v|string }}"{% if not loop.last %}{{ nl_sep }}{% endif %}
         {#- If value is list, then we want to print --k=v for each item in list with same key name -#}
     {%- elif v is iterable and v is not string %}
         {#- Save parent loop status -#}
         {%- set last = loop.last %}
         {%- for i in v %}
             {#- Unless last loop iteration for current and for parent loops print newline separator #}
-{{ '--'|indent(ind, True) }}{{ k }}="{{ i }}"{% if not loop.last or not last %}{{ nl_sep }}{% endif %}
+{{ '--'|indent(ind, True) }}{{ k }}="{{ i|string }}"{% if not loop.last or not last %}{{ nl_sep }}{% endif %}
         {%- endfor %}
     {%- endif -%}
 {% endfor -%}
