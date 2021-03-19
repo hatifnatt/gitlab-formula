@@ -53,6 +53,8 @@ gitlab:
       # runner with docker executor
       - name: "{{ grains.id.split('.')[0] }}-docker"
         url: "http://gitlab.int.domain.tld/"
+        # you can override registration token for each runner if required
+        registration-token: yourtoken
         executor: docker
         tag-list: docker
         clone-url: "http://gitlab.int.domain.tld/"

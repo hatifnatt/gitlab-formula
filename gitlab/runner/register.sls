@@ -19,13 +19,21 @@ gitlab_runner_delete_removed:
 
 # Register runner
 {% for runner in gitlab.runner.runners -%}
+  {#- Save value of 'registration-token' or 'r' in registration['token'] var
+      and remove it from  provided dict with runner registration parameters -#}
+  {%- set registration = {} %}
+  {%- for k in runner.keys()|list %}
+    {%- if k == 'registration-token' or k == 'r' %}
+      {%- do registration.update({'token': runner.pop(k)}) %}
+    {%- endif %}
+  {%- endfor %}
 gitlab_runner_register_{{ runner.name }}:
   cmd.run:
     - name: |-
         {{ register_command(runner) }}
     - env:
       # pass registration token via env, to make it little bit harder to see during state run
-      - REGISTRATION_TOKEN: {{ gitlab.runner.registration_token }}
+      - REGISTRATION_TOKEN: {{ registration.get('token', gitlab.runner.registration_token) }}
     - unless: gitlab-runner verify -n {{ runner.name }}
     - require:
       - sls: {{ tpldot }}.config
