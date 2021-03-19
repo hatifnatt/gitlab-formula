@@ -58,3 +58,9 @@ gitlab:
         clone-url: "http://gitlab.int.domain.tld/"
         docker-tlsverify: "false"
         docker-image: "debian:buster-backports"
+        # if key can be used multiple times you can set list as value for a such key
+        # and it will be rendered multiple times like --k=v1 --k=v2 etc.
+        docker-volumes:
+          - /certs/client
+          - /cache
+          - myvol:/opt/myvol

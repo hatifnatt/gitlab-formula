@@ -1,7 +1,20 @@
 {%- macro register_command(args,nl_sep=' \\',ind=8) -%}
 {%- set main_cmd = 'gitlab-runner register --non-interactive' -%}
 {{ main_cmd }}{{ nl_sep }}
-{% for k, v in args|dictsort -%}
+{#- Iterate over k:v items -#}
+{%- for k, v in args|dictsort %}
+    {#- If value is regular string just print it like --k=v -#}
+    {%- if v is string %}
+        {#- Unless last loop iteration print newline separator #}
 {{ '--'|indent(ind, True) }}{{ k }}="{{ v }}"{% if not loop.last %}{{ nl_sep }}{% endif %}
+        {#- If value is list, then we want to print --k=v for each item in list with same key name -#}
+    {%- elif v is iterable and v is not string %}
+        {#- Save parent loop status -#}
+        {%- set last = loop.last %}
+        {%- for i in v %}
+            {#- Unless last loop iteration for current and for parent loops print newline separator #}
+{{ '--'|indent(ind, True) }}{{ k }}="{{ i }}"{% if not loop.last or not last %}{{ nl_sep }}{% endif %}
+        {%- endfor %}
+    {%- endif -%}
 {% endfor -%}
 {%- endmacro -%}
