@@ -114,8 +114,9 @@ gitlab_runner_service_run_as_root:
 {%- endif %}
 
 # Gitlab Runner user will be added to docker group, to be able to control Docker via unix socket
-# NOTE: If runner is running as root that is not required
-{% if gitlab.runner.docker.add_to_group and not gitlab.runner.run_as_root -%}
+# NOTE: If runner is running as root it's still necessary to add gitlab-runner user to docker group
+# because shell executor run scrips on behalf of the gitlab-runner user
+{% if gitlab.runner.docker.add_to_group -%}
 gitlab_runner_allow_docker:
   group.present:
     - name: {{ gitlab.runner.docker.group }}
@@ -135,4 +136,18 @@ gitlab_runner_{{ gitlab.runner.docker.group }}_not_found:
         Group '{{ gitlab.runner.docker.group }}' is not found, do you have Docker installed?
         Is '{{ gitlab.runner.docker.group }}' group a correct group of Docker in your OS?
     - unless: getent group {{ gitlab.runner.docker.group }}
+
+# Remove gitlab-runner user from docker group
+{% else -%}
+gitlab_runner_deny_docker:
+  group.present:
+    - name: {{ gitlab.runner.docker.group }}
+    - delusers:
+      - {{ gitlab.runner.user }}
+    - onlyif: getent group {{ gitlab.runner.docker.group }}
+    - require:
+      - pkg: gitlab_runner_pkg
+    - watch_in:
+      - service: gitlab_runner_service
+
 {% endif -%}
