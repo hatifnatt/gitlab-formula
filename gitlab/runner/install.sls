@@ -71,8 +71,8 @@ gitlab_runner_configs_owner:
     - user: {{ gitlab.runner.user }}
     - group: {{ gitlab.runner.group }}
     - recurse:
-       - user
-       - group
+      - user
+      - group
     - require:
       - pkg: gitlab_runner_pkg
     - require_in:
@@ -98,8 +98,8 @@ gitlab_runner_configs_owner:
     - user: {{ gitlab.runner.root_user }}
     - group: {{ gitlab.runner.root_group }}
     - recurse:
-       - user
-       - group
+      - user
+      - group
     - require:
       - pkg: gitlab_runner_pkg
     - require_in:
